@@ -138,6 +138,7 @@ final class CurrencyMarket  {
      */
     private function loadData(\DateTime $date) {  
         
+        
         if (!isset($this->data[$date->format("Y")])) {
             
             $source = new SplFileObject($this->cachePath($date), "r");            
@@ -155,18 +156,25 @@ final class CurrencyMarket  {
             
             while ($row = $source->fgetcsv("|")) {
                 
-                $date = \DateTime::createFromFormat("d.m.Y", $row[0]);
+                $date = \DateTime::createFromFormat("d.m.Y", $row["0"] ?? "");
                 
-                if (!$date) break;
-                
-                $item = [];
-                
-                foreach ($row as $key => $value) {
-                    if ($key === 0) continue;
-                    $item[$header[$key]["code"]] = floatval(str_replace(",", ".", $value)) / $header[$key]["multiplier"];
+                if (!$date) {
+                    
+                    break;
+                    
+                } else {
+                    
+                    $item = [];
+                    
+                    foreach ($row as $key => $value) {
+                        if ($key === 0) continue;
+                        $item[$header[$key]["code"]] = floatval(str_replace(",", ".", $value)) / $header[$key]["multiplier"];
+                    }
+                    
+                    $this->data[$date->format("Y")][$date->format("z") + 1] = $item;
                 }
                 
-                $this->data[$date->format("Y")][$date->format("z") + 1] = $item;
+
             }
         }
     }

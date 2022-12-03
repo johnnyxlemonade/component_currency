@@ -44,11 +44,15 @@ Knihovna poskytuje obecný převodník měnových kurzů s jakýmkoli dostupným
 ## Použití
 
 ```php
-use Lemonade\CurrencyRate\CurrencyRate as prevodnik;
-use Lemonade\CurrencyRate\Currency AS mena;
+use Lemonade\Currency\CurrencyRate;
 
-$rate = new prevodnik(mena::CUR_CZK); // nastavime vychozi menu CZK
-$rate->getRate(mena::CUR_EUR); // aktuální hodnota v EUR
-$rate->getRate(mena::CUR_EUR, new \DateTime('2020-02-20')); // aktualni hodnota v EUR pro datum 20. února 2020
+//
+$test4 = CurrencyRate::getRatio("EUR"); 
+$test3 = CurrencyRate::getRatio("EUR", new \DateTime("2021-02-20"));
+$test2 = CurrencyRate::getRatio("EUR", new \DateTime("2020-02-20"));
+$test1 = CurrencyRate::getRatio("EUR", new \DateTime("2019-02-20"));
+
+_Vd($test4, $test3, $test2, $test1);
+
 ```
 
