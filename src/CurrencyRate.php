@@ -1,82 +1,126 @@
-<?php
+<?php declare(strict_types = 1);
 
-namespace Lemonade\CurrencyRate;
+namespace Lemonade\Currency;
 
-use Lemonade\CurrencyRate\Source\CzechNationalBank;
-
-class CurrencyRate {
-
-    /** @var CurrencySource */
-    private $source;
-    
-    /** @var string */
-    private $code = "CUR_CZK";
+final class CurrencyRate {
     
     /**
-     * CurrencyRate constructor.
-     * @param $code
-     * @param $source
+     * 
+     * @var CurrencyMarket
      */
-    public function __construct( $code = NULL, CurrencySource $source = null) {
-        $this->setCode($code);
-        $this->setSource($source);
-    }
-
+    private $currencyMarket;
+    
     /**
-     * Vraci dostupne meny
-     * @return array
+     *
+     * @var string
      */
-    public function getAvailableCurrencyCodes() {
-        return Currency::getCurrencyList();
-    }
-
+    private $domesticCurrency = "CZK";
+    
     /**
-     * Vraci hodnotu meny
-     * @param string $code
+     *
+     * @var string|null
+     */
+    private $foreignCurrency = NULL;
+    
+    /**
+     * Dostupne meny
+     * @var array
+     */
+    private $_availableCurrencies = [
+        "AUD",
+        "BGN",
+        "BRL",
+        "CAD",
+        "CHF",
+        "CNY",
+        "DKK",
+        "EUR",
+        "GBP",
+        "HKD",
+        "HRK",
+        "HUF",
+        "IDR",
+        "ILS",
+        "INR",
+        "ISK",
+        "JPY",
+        "KRW",
+        "MXN",
+        "MYR",
+        "NOK",
+        "NZD",
+        "PHP",
+        "PLN",
+        "RON",
+        "RUB",
+        "SEK",
+        "SGD",
+        "THB",
+        "TRY",
+        "USD",
+        "XDR",
+        "ZAR"
+    ];
+    
+    /**
+     * 
+     */
+    public function __construct() {
+        
+        $this->currencyMarket = new CurrencyMarket();
+    }
+        
+    /**
+     * 
+     * @return string
+     */
+    protected function getDomesticCurrency(): string {
+        
+        return $this->domesticCurrency;
+    }
+    
+    /**
+     *
+     */
+    protected function setForeignCurrency(string $foreignCurrency = null) {
+        
+        if(in_array($foreignCurrency, $this->_availableCurrencies)) {
+            
+            $this->foreignCurrency = $foreignCurrency;
+            
+        } else {
+            
+            $this->foreignCurrency = "CZK";
+        }
+    }
+    
+    /**
+     * 
+     * @return string|NULL
+     */
+    protected function getForeignCurrency() {
+        
+        return $this->foreignCurrency;
+    }
+    
+    /**
+     *
+     * @param string $foreignCurrency
      * @param \DateTime $date
-     * @throws \InvalidArgumentException
-     * @return float|int
      */
-    public function getRate($code, \DateTime $date = null) {
+    public static function getRatio(string $foreignCurrency, \DateTime $date = null) {
         
-        if (!isset($date)) {
-            $date = new \DateTime();
+        $test = new static();
+        $test->setForeignCurrency($foreignCurrency);
+        
+        $date = ($date instanceof \DateTime ? $date : new \DateTime());
+        $today = (new \DateTime());
+        
+        if($date->getTimestamp() > $today->getTimestamp()) {
+            
+            $date = (new \DateTime());
         }
         
-        if($date > (new \DateTime())) {
-            throw new \InvalidArgumentException('Nemuzeme odhadnout budouci hodnotu meny.');
-        }
-        
-        return $this->source->rate($code, $this->code, $date);
+        return $test->currencyMarket->getRatio("CZK", $test->getForeignCurrency(), $date);       
     }
-
-    
-    
-    /**
-     * @param mixed $code
-     */
-    private function setCode(string $code = NULL) {
-        
-        if(!is_null($code)) {
-            if(!in_array($code, $this->getAvailableCurrencyCodes())) {
-                throw new \InvalidArgumentException("Nepodporovana mena: `{$code}`.");
-            }
-        }
-                
-        $this->code = $code;
-    }
-    
-        
-    /**
-     * @param mixed $source
-     */
-    private function setSource(CurrencySource $source = null) {
-        
-        if (is_null($source)) {
-            $source = new CzechNationalBank();
-        }
-        
-        $this->source = $source;
-    }
-
 }
