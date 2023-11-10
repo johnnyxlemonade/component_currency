@@ -46,13 +46,13 @@ Knihovna poskytuje obecný převodník měnových kurzů s jakýmkoli dostupným
 ```php
 use Lemonade\Currency\CurrencyRate;
 
-//
-$test4 = CurrencyRate::getRatio("EUR"); 
-$test3 = CurrencyRate::getRatio("EUR", new \DateTime("2021-02-20"));
-$test2 = CurrencyRate::getRatio("EUR", new \DateTime("2020-02-20"));
-$test1 = CurrencyRate::getRatio("EUR", new \DateTime("2019-02-20"));
+// pomer cizi meny vuci nasi mene (pro urcity den)
+$currencyRate  = CurrencyRate::getRatio(currency: "EUR", date: new DateTime());
 
-_Vd($test4, $test3, $test2, $test1);
+// hodnota cizi meny vuci nasi mene (pro urcity den)
+$currencyValue = CurrencyRate::getValue(currency: "EUR", date: new DateTime());
+
+
 
 ```
 
