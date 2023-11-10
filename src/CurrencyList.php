@@ -2,7 +2,8 @@
 
 namespace Lemonade\Currency;
 
-final class CurrencyList {
+final class CurrencyList
+{
 
     /**
      * 
@@ -88,3 +89,5 @@ final class CurrencyList {
     }
     
 }
+/* End of file CurrencyList.php */
+/* /lemonade/component_currency/src/CurrencyList.php */

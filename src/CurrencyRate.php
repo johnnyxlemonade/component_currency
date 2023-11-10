@@ -1,126 +1,53 @@
 <?php declare(strict_types = 1);
 
 namespace Lemonade\Currency;
+use DateTime;
 
-final class CurrencyRate {
-    
+final class CurrencyRate
+{
     /**
-     * 
-     * @var CurrencyMarket
+     * @param CurrencyMarket $market
+     * @param string $currency
+     * @param DateTime $date
      */
-    private $currencyMarket;
-    
+    public function __construct(protected readonly CurrencyMarket $market, protected readonly string $currency, protected readonly DateTime $date) {}
+
     /**
-     *
-     * @var string
+     * @param string $currency
+     * @param DateTime $date
+     * @return float|int
      */
-    private $domesticCurrency = "CZK";
-    
-    /**
-     *
-     * @var string|null
-     */
-    private $foreignCurrency = NULL;
-    
-    /**
-     * Dostupne meny
-     * @var array
-     */
-    private $_availableCurrencies = [
-        "AUD",
-        "BGN",
-        "BRL",
-        "CAD",
-        "CHF",
-        "CNY",
-        "DKK",
-        "EUR",
-        "GBP",
-        "HKD",
-        "HRK",
-        "HUF",
-        "IDR",
-        "ILS",
-        "INR",
-        "ISK",
-        "JPY",
-        "KRW",
-        "MXN",
-        "MYR",
-        "NOK",
-        "NZD",
-        "PHP",
-        "PLN",
-        "RON",
-        "RUB",
-        "SEK",
-        "SGD",
-        "THB",
-        "TRY",
-        "USD",
-        "XDR",
-        "ZAR"
-    ];
-    
-    /**
-     * 
-     */
-    public function __construct() {
-        
-        $this->currencyMarket = new CurrencyMarket();
+    public static function getRatio(string $currency, DateTime $date): float|int
+    {
+
+        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket(action: "ratio");
     }
-        
+
     /**
-     * 
-     * @return string
+     * @param string $currency
+     * @param DateTime $date
+     * @return float|int
      */
-    protected function getDomesticCurrency(): string {
-        
-        return $this->domesticCurrency;
+    public static function getValue(string $currency, DateTime $date): float|int
+    {
+
+        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket(action: "value");
     }
-    
+
     /**
-     *
+     * @param string $action
+     * @return float
      */
-    protected function setForeignCurrency(string $foreignCurrency = null) {
-        
-        if(in_array($foreignCurrency, $this->_availableCurrencies)) {
-            
-            $this->foreignCurrency = $foreignCurrency;
-            
-        } else {
-            
-            $this->foreignCurrency = "CZK";
-        }
+    protected function _executeMarket(string $action = "ratio"): float
+    {
+
+        return match ($action) {
+            default => $this->market->getRatio(currency: $this->currency, date: $this->date),
+            "value" => $this->market->getValue(currency: $this->currency, date: $this->date)
+        };
+
     }
-    
-    /**
-     * 
-     * @return string|NULL
-     */
-    protected function getForeignCurrency() {
-        
-        return $this->foreignCurrency;
-    }
-    
-    /**
-     *
-     * @param string $foreignCurrency
-     * @param \DateTime $date
-     */
-    public static function getRatio(string $foreignCurrency, \DateTime $date = null) {
-        
-        $test = new static();
-        $test->setForeignCurrency($foreignCurrency);
-        
-        $date = ($date instanceof \DateTime ? $date : new \DateTime());
-        $today = (new \DateTime());
-        
-        if($date->getTimestamp() > $today->getTimestamp()) {
-            
-            $date = (new \DateTime());
-        }
-        
-        return $test->currencyMarket->getRatio("CZK", $test->getForeignCurrency(), $date);       
-    }
+
 }
+/* End of file CurrencyRate.php */
+/* /lemonade/component_currency/src/CurrencyRate.php */
