@@ -75,7 +75,7 @@ final class CurrencyList
      */
     public static function getSymbol(string $currency = null): string {
         
-        return (static::$_currencySymbol[$currency] ?? self::CUR_CZK);
+        return (static::$_currencySymbol[$currency] ?? self::CURRENCY_CZK);
     }
     
     /**
@@ -85,7 +85,7 @@ final class CurrencyList
      */
     public static function getTranslator(string $currency = null): string {
         
-        return (static::$_currencyTranslator[$currency] ?? static::$_currencyTranslator[self::CUR_CZK]);
+        return (static::$_currencyTranslator[$currency] ?? static::$_currencyTranslator[self::CURRENCY_CZK]);
     }
     
 }
