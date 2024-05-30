@@ -1,6 +1,7 @@
-<?php declare(strict_types = 1);
+<?php declare(strict_types=1);
 
 namespace Lemonade\Currency;
+
 use DateTime;
 
 final class CurrencyRate
@@ -10,7 +11,9 @@ final class CurrencyRate
      * @param string $currency
      * @param DateTime $date
      */
-    public function __construct(protected readonly CurrencyMarket $market, protected readonly string $currency, protected readonly DateTime $date) {}
+    public function __construct(protected readonly CurrencyMarket $market, protected readonly string $currency, protected readonly DateTime $date)
+    {
+    }
 
     /**
      * @param string $currency
@@ -20,7 +23,7 @@ final class CurrencyRate
     public static function getRatio(string $currency, DateTime $date): float|int
     {
 
-        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket(action: "ratio");
+        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket();
     }
 
     /**
