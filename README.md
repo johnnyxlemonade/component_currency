@@ -1,5 +1,5 @@
 # Popis
-Knihovna poskytuje obecný převodník měnových kurzů s jakýmkoli dostupným zdrojem dat.
+Knihovna poskytuje obecný převodník měnových kurzů s ČNB jakožto dostupným zdrojem dat.
 
 ## Dostupné zdroje dat
 * API ČNB
