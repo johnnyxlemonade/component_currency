@@ -1,54 +1,62 @@
 <?php declare(strict_types=1);
 
 namespace Lemonade\Currency;
-
 use DateTime;
 
 final class CurrencyRate
 {
+
     /**
-     * @param CurrencyMarket $market
-     * @param string $currency
-     * @param DateTime $date
+     * @var CurrencyMarket|null
      */
-    public function __construct(protected readonly CurrencyMarket $market, protected readonly string $currency, protected readonly DateTime $date)
+    protected ?CurrencyMarket $market = null;
+
+    /**
+     * @param DateTime|null $date
+     */
+    public function __construct(public ?DateTime $date = null)
     {
+
+        $this->date   = $date ?? new DateTime();
+        $this->market = new CurrencyMarket(date: $this->date);
+
     }
 
     /**
      * @param string $currency
-     * @param DateTime $date
-     * @return float|int
-     */
-    public static function getRatio(string $currency, DateTime $date): float|int
-    {
-
-        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket();
-    }
-
-    /**
-     * @param string $currency
-     * @param DateTime $date
-     * @return float|int
-     */
-    public static function getValue(string $currency, DateTime $date): float|int
-    {
-
-        return (new CurrencyRate(market: new CurrencyMarket(), currency: $currency, date: $date))->_executeMarket(action: "value");
-    }
-
-    /**
      * @param string $action
      * @return float
      */
-    protected function _executeMarket(string $action = "ratio"): float
+    public function executeMarket(string $currency, string $action = "ratio"): float
     {
 
         return match ($action) {
-            default => $this->market->getRatio(currency: $this->currency, date: $this->date),
-            "value" => $this->market->getValue(currency: $this->currency, date: $this->date)
+            default => $this->market->getRatio(currency: $currency),
+            "value" => $this->market->getValue(currency: $currency)
         };
 
+    }
+
+    /**
+     * @param string $currency
+     * @param DateTime|null $date
+     * @return float
+     */
+    public static function getRatio(string $currency, ?DateTime $date = null): float
+    {
+
+        return (new CurrencyRate(date: $date))->executeMarket(currency: $currency);
+    }
+
+    /**
+     * @param string $currency
+     * @param DateTime|null $date
+     * @return float
+     */
+    public static function getValue(string $currency, ?DateTime $date = null): float
+    {
+
+        return (new CurrencyRate(date: $date))->executeMarket(currency: $currency, action: "value");
     }
 
 }

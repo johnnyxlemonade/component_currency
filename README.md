@@ -45,12 +45,26 @@ Knihovna poskytuje obecný převodník měnových kurzů s jakýmkoli dostupným
 
 ```php
 use Lemonade\Currency\CurrencyRate;
+use Lemonade\Currency\CurrencyMarket;
 
-// pomer cizi meny vuci nasi mene (pro urcity den)
-$currencyRate  = CurrencyRate::getRatio(currency: "EUR", date: new DateTime());
+// pomer cizi meny vuci nasi mene (aktualni den)
+$currencyRate  = CurrencyRate::getRatio(currency: "EUR");
 
-// hodnota cizi meny vuci nasi mene (pro urcity den)
-$currencyValue = CurrencyRate::getValue(currency: "EUR", date: new DateTime());
+// hodnota cizi meny vuci nasi mene (aktualni den)
+$currencyValue = CurrencyRate::getValue(currency: "EUR");
+
+// pomer cizi meny vuci nasi mene (aktualni den)
+$currencyRate2  = CurrencyRate::getRatio(currency: "EUR");
+
+// hodnota cizi meny vuci nasi mene (aktualni den)
+$currencyValue2 = CurrencyRate::getValue(currency: "EUR");
+
+// klasicky constructor 
+$curencyMarket = new CurrencyMarket(date: DateTime::createFromFormat(format: "Y-m-d", datetime: "2023-01-04"));
+$curencyMarket->getValue(currency: "EUR"); // hodnota cizi meny vuci nasi mene
+$curencyMarket->getRatio(currency: "EUR")  // pomer cizi meny vuci nasi mene
+
+
 
 
 

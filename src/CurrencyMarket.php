@@ -36,58 +36,49 @@ final class CurrencyMarket
     protected array $data = [];
 
     /**
-     * @var int
+     * @var float
      */
-    protected int $defaultValue = 1;
+    protected float $defaultValue = 1.00;
 
     /**
      * @var float
      */
     protected float $defaultEuro = 24.00;
 
+
     /**
-     * @param string $currency
      * @param DateTime $date
-     * @return float
      */
-    public function getRatio(string $currency, DateTime $date): float
+    public function __construct(protected readonly DateTime $date)
     {
 
-        $test = 1.0;
-
-        try {
-
-            // source
-            $this->loadSource(date: $date);
-
-            // data
-            $data = $this->findRow(date: $date);
-
-            if (!isset($data[$currency])) {
-
-                $test = match ($currency) {
-                    default => 0.00,
-                    CurrencyList::CURRENCY_CZK => $this->defaultValue,
-                    CurrencyList::CURRENCY_EUR => $this->defaultEuro
-                };
-
-            } else {
-
-                $test = ($data[$currency] ?? $this->defaultValue);
-            }
-
-        } catch (Exception) {
-        }
-
-        return round(num: (float)($this->defaultValue / $test), precision: 8);
     }
 
     /**
      * @param string $currency
-     * @param DateTime $date
      * @return float
      */
-    public function getValue(string $currency, DateTime $date): float
+    public function getRatio(string $currency): float
+    {
+
+        return round(num: (float) ($this->defaultValue / $this->processValueLine(currency: $currency)), precision: 2);
+    }
+
+    /**
+     * @param string $currency
+     * @return float
+     */
+    public function getValue(string $currency): float
+    {
+
+        return $this->processValueLine(currency: $currency);
+    }
+
+    /**
+     * @param string $currency
+     * @return float
+     */
+    protected function processValueLine(string $currency): float
     {
 
         $test = 1.0;
@@ -95,12 +86,12 @@ final class CurrencyMarket
         try {
 
             // source
-            $this->loadSource(date: $date);
+            $this->loadSource(date: $this->date);
 
             // data
-            $data = $this->findRow(date: $date);
+            $data = $this->findRow(date: $this->date);
 
-            if (!isset($data[$currency])) {
+            if(empty($data[$currency])) {
 
                 $test = match ($currency) {
                     default => 0.00,
@@ -110,10 +101,11 @@ final class CurrencyMarket
 
             } else {
 
-                $test = ($data[$currency] ?? $this->defaultValue);
+                $test = $data[$currency];
             }
 
         } catch (Exception) {
+
         }
 
         return $test;
@@ -213,12 +205,11 @@ final class CurrencyMarket
 
             $success = file_put_contents(filename: $dir, data: file_get_contents(filename: $this->sourceUrl(date: $date)));
 
-            if ($success === FALSE)
-                throw new RuntimeException(
-                    "Chyba zapisu " .
-                    "url: `{$this->sourceUrl(date: $date)}` " .
-                    "soubor: `{$this->cachePath(date: $date)}`"
-                );
+            if ($success === FALSE) {
+
+                throw new RuntimeException("Lemonade\\Currency\\Error " . "url: `{$this->sourceUrl(date: $date)}` , soubor: `{$this->cachePath(date: $date)}`");
+            }
+
         }
     }
 
@@ -235,6 +226,7 @@ final class CurrencyMarket
             $first = $source->fgetcsv(separator: "|");
             $header = [];
 
+
             foreach ($first as $i => $value) {
                 if ($i === 0) continue;
 
@@ -248,9 +240,9 @@ final class CurrencyMarket
 
             while ($row = $source->fgetcsv(separator: "|")) {
 
-                $date = DateTime::createFromFormat("d.m.Y", ($row["0"] ?? ""));
+                $dateLine = DateTime::createFromFormat(format: "j.n.Y", datetime: ($row["0"] ?? ""));
 
-                if (!$date) {
+                if (!$dateLine) {
 
                     break;
 
@@ -260,40 +252,23 @@ final class CurrencyMarket
 
                     foreach ($row as $key => $value) {
                         if ($key === 0) continue;
-                        $item[$header[$key]["code"]] = (float)str_replace(search: ",", replace: ".", subject: $value) / $header[$key]["multiplier"];
+                        $item[$header[$key]["code"]] = (float) str_replace(search: ",", replace: ".", subject: $value) / $header[$key]["multiplier"];
                     }
 
-                    $this->data[$date->format(format: "Y")][(int)$date->format(format: "z") + 1] = $item;
+                    $this->data[$dateLine->format(format: "Y")][$dateLine->format(format: "Y-m-d")] = $item;
                 }
-
-
             }
         }
     }
 
     /**
      * @param DateTime $date
-     * @return array
+     * @return array<float>
      */
     protected function findRow(DateTime $date): array
     {
 
-        $data = null;
-        $day = (int)$date->format(format: "z") + 1;
-
-        foreach (($this->data[$date->format(format: "Y")] ?? []) as $dayYear => $val) {
-
-            if ($data && $dayYear > $day) break;
-
-            $data = $val;
-
-            if ($day <= $dayYear) {
-
-                $day = $dayYear;
-            }
-        }
-
-        return (array)$data;
+        return ($this->data[$date->format(format: "Y")][$date->format(format: "Y-m-d")] ?? []);
     }
 
 
