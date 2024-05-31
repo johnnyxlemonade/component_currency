@@ -65,7 +65,7 @@ final class CurrencyStorage
     }
 
     /**
-     * @return mixed[]
+     * @return array<array<string|float>>
      */
     public function getData(): array
     {

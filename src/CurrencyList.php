@@ -37,7 +37,7 @@ final class CurrencyList
 
     /**
      * Symbol
-     * @var array
+     * @var array<string>
      */
     private static array $_currencySymbol = [
         self::CURRENCY_CZK => "Kč",
@@ -49,7 +49,7 @@ final class CurrencyList
 
     /**
      * Jazyky
-     * @var array
+     * @var array<string>
      */
     private static array $_currencyTranslator = [
         self::CURRENCY_CZK => "čeština",
