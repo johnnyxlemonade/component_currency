@@ -3,6 +3,10 @@
 namespace Lemonade\Currency;
 use DateTime;
 
+/**
+ * @CurrencyRate
+ * @\Lemonade\Currency\CurrencyRate
+ */
 final class CurrencyRate
 {
 
