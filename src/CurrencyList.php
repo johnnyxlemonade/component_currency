@@ -4,93 +4,89 @@ namespace Lemonade\Currency;
 
 final class CurrencyList
 {
-
-    /**
-     *
-     * @var string
-     */
     public const CURRENCY_CZK = "CZK";
-
-    /**
-     *
-     * @var string
-     */
     public const CURRENCY_EUR = "EUR";
-
-    /**
-     *
-     * @var string
-     */
     public const CURRENCY_HUF = "HUF";
-
-    /**
-     *
-     * @var string
-     */
     public const CURRENCY_PLN = "PLN";
-
-    /**
-     *
-     * @var string
-     */
     public const CURRENCY_GBP = "GBP";
 
     /**
-     * Symbol
-     * @var array<string>
+     * Podrobnosti o měnách, obsahuje symboly a názvy jazyků.
+     *
+     * @var array<string, array<string, string>>
      */
-    private static array $_currencySymbol = [
-        self::CURRENCY_CZK => "Kč",
-        self::CURRENCY_EUR => "€",
-        self::CURRENCY_HUF => "ft",
-        self::CURRENCY_PLN => "zł",
-        self::CURRENCY_GBP => "£"
+    private static array $currencies = [
+        self::CURRENCY_CZK => ['symbol' => 'Kč', 'languageName' => 'čeština'],
+        self::CURRENCY_EUR => ['symbol' => '€', 'languageName' => 'němčina'],
+        self::CURRENCY_HUF => ['symbol' => 'ft', 'languageName' => 'maďarština'],
+        self::CURRENCY_PLN => ['symbol' => 'zł', 'languageName' => 'polština'],
+        self::CURRENCY_GBP => ['symbol' => '£', 'languageName' => 'angličtina'],
     ];
 
     /**
-     * Jazyky
-     * @var array<string>
+     * Vrací seznam symbolů všech podporovaných měn.
+     *
+     * @return array<string, string> Klíč představuje kód měny a hodnota symbol měny.
      */
-    private static array $_currencyTranslator = [
-        self::CURRENCY_CZK => "čeština",
-        self::CURRENCY_EUR => "němčina",
-        self::CURRENCY_HUF => "maďarština",
-        self::CURRENCY_PLN => "polština",
-        self::CURRENCY_GBP => "angličtina"
-    ];
+    public static function getCurrencySymbolList(): array
+    {
+        return array_map(fn($currency) => $currency['symbol'], self::$currencies);
+    }
 
     /**
-     * Vraci dostupne symboly men
-     * @return string[]
+     * Vrací symbol měny nebo výchozí symbol pro CZK.
+     *
+     * @param string|null $currency Kód měny (např. "CZK", "EUR").
+     * @return string Symbol měny nebo výchozí symbol pro CZK.
+     */
+    public static function getCurrencySymbol(?string $currency = null): string
+    {
+        return self::$currencies[$currency]['symbol'] ?? self::$currencies[self::CURRENCY_CZK]['symbol'];
+    }
+
+    /**
+     * Vrací název jazyka spojený s měnou nebo výchozí jazyk pro CZK.
+     *
+     * @param string|null $currency Kód měny (např. "CZK", "EUR").
+     * @return string Název jazyka spojený s měnou nebo výchozí jazyk pro CZK.
+     */
+    public static function getCurrencyLanguageName(?string $currency = null): string
+    {
+        return self::$currencies[$currency]['languageName'] ?? self::$currencies[self::CURRENCY_CZK]['languageName'];
+    }
+
+    /**
+     * Vrací seznam symbolů všech podporovaných měn.
+     *
+     * @deprecated Použijte metodu getCurrencySymbolList() místo getSymbolList().
+     * @return array<string>
      */
     public static function getSymbolList(): array
     {
-
-        return CurrencyList::$_currencySymbol;
+        return array_column(self::$currencies, 'symbol');
     }
 
     /**
-     * Vraci dostupne symbol meny
+     * Vrací symbol měny nebo výchozí symbol pro CZK.
+     *
+     * @deprecated Použijte metodu getCurrencySymbol() místo getSymbol().
      * @param string|null $currency
      * @return string
      */
-    public static function getSymbol(string $currency = null): string
+    public static function getSymbol(?string $currency = null): string
     {
-
-        return (CurrencyList::$_currencySymbol[$currency] ?? self::CURRENCY_CZK);
+        return self::getCurrencySymbol($currency);
     }
 
     /**
-     * Vraci jazyky pro menu
-     * @param string|null $currency
-     * @return string
+     * Vrací jméno jazyka spojeného s danou měnou.
+     *
+     * @deprecated Použijte metodu getCurrencyLanguageName() místo getTranslator().
+     * @param string|null $currency Kód měny (např. "CZK", "EUR").
+     * @return string Název jazyka spojeného s měnou nebo výchozí jazyk pro CZK.
      */
-    public static function getTranslator(string $currency = null): string
+    public static function getTranslator(?string $currency = null): string
     {
-
-        return (CurrencyList::$_currencyTranslator[$currency] ?? CurrencyList::$_currencyTranslator[self::CURRENCY_CZK]);
+        return self::getCurrencyLanguageName($currency);
     }
-
 }
-/* End of file CurrencyList.php */
-/* /lemonade/component_currency/src/CurrencyList.php */
