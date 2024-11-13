@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace Lemonade\Currency;
+use DateInterval;
 use DateTime;
 
 /**
@@ -20,10 +21,25 @@ final class CurrencyRate
      */
     public function __construct(public ?DateTime $date = null)
     {
+        $currentTime = new DateTime();
 
-        $this->date   = $date ?? new DateTime();
+        // Pokud není $date předáno, použije se aktuální čas
+        $this->date = $date ?: new DateTime();
+
+        // Porovnání $date s aktuálním časem bez milisekund
+        if ($this->date->format("Y-m-d H:i:s") === $currentTime->format("Y-m-d H:i:s")) {
+
+            // cnb zverejnuje nove data po 14:30
+            $afternoon = new DateTime('14:30');
+
+            // Pokud je aktuální čas před 14:30, použije se předchozí den
+            if ($currentTime < $afternoon) {
+                $this->date->sub(new DateInterval('P1D'));
+            }
+        }
+
+        // Inicializace CurrencyMarket s daným datem
         $this->market = new CurrencyMarket(date: $this->date);
-
     }
 
     /**
