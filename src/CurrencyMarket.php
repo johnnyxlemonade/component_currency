@@ -32,6 +32,26 @@ final class CurrencyMarket
      */
     protected float $defaultEuro = 24.00;
 
+    /**
+     * @var float
+     */
+    protected float $defaultLibra = 28.00;
+
+    /**
+     * @var float
+     */
+    protected float $defaultZloty = 5.00;
+
+    /**
+     * @var float
+     */
+    protected float $defaultForint = 0.05;
+
+    /**
+     * @var float
+     */
+    protected float $defaultDollar = 20.00;
+
 
     /**
      * @param DateTime $date
@@ -83,7 +103,12 @@ final class CurrencyMarket
                 $test = match ($currency) {
                     default => 1.00,
                     CurrencyList::CURRENCY_CZK => $this->defaultValue,
-                    CurrencyList::CURRENCY_EUR => $this->defaultEuro
+                    CurrencyList::CURRENCY_EUR => $this->defaultEuro,
+                    CurrencyList::CURRENCY_GBP => $this->defaultLibra,
+                    CurrencyList::CURRENCY_PLN => $this->defaultZloty,
+                    CurrencyList::CURRENCY_HUF => $this->defaultForint,
+                    CurrencyList::CURRENCY_USD => $this->defaultDollar
+
                 };
 
             } else {

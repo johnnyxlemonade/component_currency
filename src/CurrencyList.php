@@ -9,6 +9,7 @@ final class CurrencyList
     public const CURRENCY_HUF = "HUF";
     public const CURRENCY_PLN = "PLN";
     public const CURRENCY_GBP = "GBP";
+    public const CURRENCY_USD = "USD";
 
     /**
      * Podrobnosti o měnách, obsahuje symboly a názvy jazyků.
@@ -21,6 +22,7 @@ final class CurrencyList
         self::CURRENCY_HUF => ['symbol' => 'ft', 'languageName' => 'maďarština'],
         self::CURRENCY_PLN => ['symbol' => 'zł', 'languageName' => 'polština'],
         self::CURRENCY_GBP => ['symbol' => '£', 'languageName' => 'angličtina'],
+        self::CURRENCY_USD => ['symbol' => '$', 'languageName' => 'angličtina'],
     ];
 
     /**
