@@ -25,32 +25,32 @@ final class CurrencyMarket
     /**
      * @var float
      */
-    protected float $defaultValue = 1.00;
+    protected static float $defaultValue = 1.00;
 
     /**
      * @var float
      */
-    protected float $defaultEuro = 24.00;
+    protected static float $defaultEuro = 24.00;
 
     /**
      * @var float
      */
-    protected float $defaultLibra = 28.00;
+    protected static float $defaultLibra = 28.00;
 
     /**
      * @var float
      */
-    protected float $defaultZloty = 5.00;
+    protected static float $defaultZloty = 5.00;
 
     /**
      * @var float
      */
-    protected float $defaultForint = 0.05;
+    protected static float $defaultForint = 0.05;
 
     /**
      * @var float
      */
-    protected float $defaultDollar = 20.00;
+    protected static float $defaultDollar = 20.00;
 
 
     /**
@@ -85,39 +85,46 @@ final class CurrencyMarket
     }
 
     /**
+     * @return array
+     */
+    public static function getDefaultCurrencies(): array
+    {
+
+        return CurrencyList::getCurrencies();
+    }
+
+    /**
+     * @param string $currency
+     * @return float
+     */
+    public static function getDefaultCurrencyValue(string $currency): float
+    {
+
+        return match (strtoupper($currency)) {
+            default => 1.00,
+            CurrencyList::CURRENCY_CZK => self::$defaultValue, // jen kvuli konzistenci
+            CurrencyList::CURRENCY_EUR => self::$defaultEuro,
+            CurrencyList::CURRENCY_GBP => self::$defaultLibra,
+            CurrencyList::CURRENCY_PLN => self::$defaultZloty,
+            CurrencyList::CURRENCY_HUF => self::$defaultForint,
+            CurrencyList::CURRENCY_USD => self::$defaultDollar
+        };
+
+    }
+
+    /**
      * @param string $currency
      * @return float
      */
     protected function processValueLine(string $currency): float
     {
 
-        $test = 1.0;
+        // data
+        $test = $this->data->findRow(currency: $currency);
 
-        try {
+        if($test === false) {
 
-            // data
-            $data = $this->data->findRow(currency: $currency);
-
-            if($data === false) {
-
-                $test = match ($currency) {
-                    default => 1.00,
-                    CurrencyList::CURRENCY_CZK => $this->defaultValue,
-                    CurrencyList::CURRENCY_EUR => $this->defaultEuro,
-                    CurrencyList::CURRENCY_GBP => $this->defaultLibra,
-                    CurrencyList::CURRENCY_PLN => $this->defaultZloty,
-                    CurrencyList::CURRENCY_HUF => $this->defaultForint,
-                    CurrencyList::CURRENCY_USD => $this->defaultDollar
-
-                };
-
-            } else {
-
-                $test = $data;
-            }
-
-        } catch (Exception) {
-
+            return self::getDefaultCurrencyValue(currency: $currency);
         }
 
         return $test;

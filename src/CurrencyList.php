@@ -26,6 +26,23 @@ final class CurrencyList
     ];
 
     /**
+     * Definovane meny
+     * @todo meny do enum
+     * @return string[]
+     */
+    public static function getCurrencies(): array
+    {
+        return [
+            self::CURRENCY_CZK,
+            self::CURRENCY_EUR,
+            self::CURRENCY_HUF,
+            self::CURRENCY_PLN,
+            self::CURRENCY_GBP,
+            self::CURRENCY_USD
+        ];
+    }
+
+    /**
      * Vrací seznam symbolů všech podporovaných měn.
      *
      * @return array<string, string> Klíč představuje kód měny a hodnota symbol měny.
