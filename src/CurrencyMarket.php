@@ -71,7 +71,7 @@ final class CurrencyMarket
     public function getRatio(string $currency): float
     {
 
-        return round(num: ($this->defaultValue / $this->processValueLine(currency: $currency)), precision: 2);
+        return round(num: (self::$defaultValue / $this->processValueLine(currency: $currency)), precision: 2);
     }
 
     /**
