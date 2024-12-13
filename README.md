@@ -1,9 +1,10 @@
+# Lemonade Currency Conversion Library
+
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Build Status](https://img.shields.io/github/actions/workflow/status/johnnyxlemonade/component_currency/php-ci.yml?branch=master&label=build)
 ![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue)
 ![Packagist Version](https://img.shields.io/packagist/v/lemonade/component_currency)
 
-# Lemonade Currency Conversion Library 
 **Lemonade Currency Conversion Library** provides a general-purpose currency converter using the Czech National Bank (CNB) as the primary data source.
 
 ## Features
