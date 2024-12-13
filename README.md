@@ -1,72 +1,76 @@
-# Popis
-Knihovna poskytuje obecný převodník měnových kurzů s ČNB jakožto dostupným zdrojem dat.
+![License](https://img.shields.io/badge/license-MIT-green)
+![PHP Version](https://img.shields.io/badge/php-%3E%3D8.1-blue)
+![Packagist Version](https://img.shields.io/packagist/v/lemonade/component_currency)
 
-## Dostupné zdroje dat
-* API ČNB
+# Lemonade Currency Conversion Library 
+**Lemonade Currency Conversion Library** provides a general-purpose currency converter using the Czech National Bank (CNB) as the primary data source.
 
-## Dostupné měny
-Česká národní banka poskytuje tyto měny (dostupné vždy každy den po 14:30) 
+## Features
+- Supports PHP 8.1+
+- Fully typed and optimized for static analysis with PHPStan (Level 10 Strict, Bleeding Edge)
+- Provides exchange rates and currency values for supported currencies
+- Caches and validates data from the Czech National Bank (CNB)
+- Fallback to default values when data is unavailable
+- Automatically adjusts to CNB's schedule:
+    - Exchange rates are published on working days after 14:30.
+    - Before 14:30, the previous day's rates are used as "current".
 
-* CZK - Czech Republic
-* AUD - Australia
-* BRL - Brazil
-* BGN - Bulgaria
-* CNY - China
-* DKK - Denmark
-* EUR - EMU
-* PHP - Philippines
-* HKD - Hong Kong
-* HRK - Croatia
-* INR - India
-* IDR - Indonesia
-* ILS - Israel
-* JPY - Japan
-* ZAR - SAR
-* KRW - South Korea
-* CAD - Canada
-* HUF - Hungary
-* MYR - Malaysia
-* MXN - Mexico
-* XDR - MMF
-* NOK - Norway
-* NZD - New Zealand
-* PLN - Poland
-* RON - Romania
-* RUB - Russia
-* SGD - Singapur
-* SEK - Sweden
-* CHF - Switzerland
-* THB - Thailand
-* TRY - Turkish
-* USD - USA
-* GBP - Great Britain
+## Supported Data Sources
+- CNB API
 
-## Použití
+## Supported Currencies
+- CZK - Czech Republic
+- EUR - Eurozone
+- HUF - Hungary
+- PLN - Poland
+- GBP - Great Britain
+- USD - United States
+
+## Installation
+Use Composer to install the library:
+```bash
+composer require lemonade/currency
+```
+
+## Usage
 
 ```php
 use Lemonade\Currency\CurrencyRate;
 use Lemonade\Currency\CurrencyMarket;
 
-// pomer cizi meny vuci nasi mene (aktualni den)
-$currencyRate  = CurrencyRate::getRatio(currency: "EUR");
+// Get the ratio of a foreign currency against the local currency (current day)
+$currencyRate = CurrencyRate::getRatio(currency: "EUR");
 
-// hodnota cizi meny vuci nasi mene (aktualni den)
-$currencyValue = CurrencyRate::getValue(currency: "EUR");
+// Get the value of a foreign currency against the local currency
+$currencyValue = CurrencyRate::getValue(currency: "USD");
 
-// pomer cizi meny vuci nasi mene (aktualni den)
-$currencyRate2  = CurrencyRate::getRatio(currency: "EUR");
+// Access market data for a specific date
+$market = new CurrencyMarket(new DateTime('2023-12-01'));
+$ratio = $market->getRatio(currency: "EUR");
+$value = $market->getValue(currency: "USD");
 
-// hodnota cizi meny vuci nasi mene (aktualni den)
-$currencyValue2 = CurrencyRate::getValue(currency: "EUR");
-
-// klasicky constructor 
-$curencyMarket = new CurrencyMarket(date: DateTime::createFromFormat(format: "Y-m-d", datetime: "2023-01-04"));
-$curencyMarket->getValue(currency: "EUR"); // hodnota cizi meny vuci nasi mene
-$curencyMarket->getRatio(currency: "EUR")  // pomer cizi meny vuci nasi mene
-
-
-
-
-
+// Alternatively, specify a date directly in the static methods
+$currencyRateForSpecificDate = CurrencyRate::getRatio(currency: "EUR", date: new DateTime('2023-12-01'));
+$currencyValueForSpecificDate = CurrencyRate::getValue(currency: "USD", date: new DateTime('2023-12-01'));
 ```
+
+## Configuration
+The library dynamically stores data in a project-specific `storage/export/cnb` directory. Ensure this directory is writable.
+
+## Advanced Features
+- **Static Analysis**: The library is fully compatible with PHPStan Level 10, strict mode, and bleeding edge.
+- **Default Values**: Fallback to predefined default values for all currencies when data is unavailable.
+- **Extensibility**: Easily extendable for additional data sources or customization.
+
+## Testing
+To run unit tests:
+```bash
+vendor/bin/phpunit
+```
+
+## Contributing
+Feel free to submit issues or create pull requests to improve this library.
+
+## License
+This library is licensed under the MIT License. See the `LICENSE` file for details.
 

@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace Lemonade\Currency;
+
 use DateTime;
 use Exception;
 use RuntimeException;
@@ -15,49 +16,82 @@ use function sprintf;
 use const DIRECTORY_SEPARATOR;
 
 /**
+ * CurrencyStorage class
+ *
+ * This class handles the storage and retrieval of currency exchange data.
+ * It downloads exchange rate data from the Czech National Bank (CNB) and stores it in a local file system.
+ *
  * @CurrencyStorage
  * @\Lemonade\Currency\CurrencyStorage
  */
 final class CurrencyStorage
 {
-
     /**
-     * URL
+     * The endpoint for downloading currency exchange data.
+     *
      * @var string
      */
     public const SOURCE_ENDPOINT = "https://www.cnb.cz/cs/financni_trhy/devizovy_trh/kurzy_devizoveho_trhu/rok.txt?rok=%d";
 
     /**
-     * @param DateTime $date
-     * @param string $directory
+     * The expected date format in the data file.
+     *
+     * @var string
      */
-    public function __construct(protected readonly DateTime $date, protected readonly string $directory = "./storage/0/export/cnb")
+    protected const DATA_LINE_FORMAT = "j.n.Y";
+
+    /**
+     * The  date format in the data file.
+     *
+     * @var string
+     */
+    public const DATA_SAVE_FORMAT = "Y-m-d";
+
+    /**
+     * The directory where currency exchange files will be stored.
+     *
+     * @var string
+     */
+    private string $directory;
+
+    /**
+     * Constructor initializes the directory and fetches data.
+     *
+     * @param DateTime $date The date for which currency data is being stored.
+     */
+    public function __construct(protected readonly DateTime $date)
     {
+        // Find the root directory of the project
+        $projectRoot = dirname(__DIR__, 4); // Navigate out of `vendor/lemonade/component_currency/src`
+        $this->directory = $projectRoot . DIRECTORY_SEPARATOR . 'storage' . DIRECTORY_SEPARATOR . 'export' . DIRECTORY_SEPARATOR . 'cnb';
 
         $this->_storeSource();
     }
 
-
     /**
-     * @return string
+     * Retrieves the full path to the storage file for the specified year.
+     *
+     * @return string The file path for the currency data file.
      */
     public function getFile(): string
     {
-
-        return $this->directory . DIRECTORY_SEPARATOR . "cnb_" . $this->date->format(format: "Y") . ".lock";
+        return $this->directory . DIRECTORY_SEPARATOR . $this->date->format("Y") . ".lock";
     }
 
     /**
-     * @return string
+     * Retrieves the URL for the CNB currency data for the specified year.
+     *
+     * @return string The URL for downloading currency exchange data.
      */
     public function getUrl(): string
     {
-
-        return sprintf(CurrencyStorage::SOURCE_ENDPOINT, $this->date->format(format: "Y"));
+        return sprintf(CurrencyStorage::SOURCE_ENDPOINT, $this->date->format("Y"));
     }
 
     /**
-     * @return DateTime
+     * Retrieves the date associated with the storage instance.
+     *
+     * @return DateTime The date for which the data is stored.
      */
     public function getDate(): DateTime
     {
@@ -65,58 +99,56 @@ final class CurrencyStorage
     }
 
     /**
-     * @return array<array<string|float>>
+     * Parses and retrieves the currency exchange data from the storage file.
+     *
+     * @return array<string, array<string, float>> An array of currency exchange rates indexed by date and currency code.
      */
     public function getData(): array
     {
-
         $data = [];
 
-        if (file_exists(filename: $this->getFile())) {
-
-            $source = new SplFileObject(filename: $this->getFile(), mode: "r");
-            $first = $source->fgetcsv(separator: "|");
+        if (file_exists($this->getFile())) {
+            $source = new SplFileObject($this->getFile(), "r");
+            $first = $source->fgetcsv("|");
             $header = [];
 
-            if(is_array($first)) {
+            // Parse header row for currency multipliers and codes
+            if (is_array($first)) {
                 foreach ($first as $i => $value) {
                     if ($i === 0) continue;
 
-                    list($multiplier, $code) = explode(separator: " ", string: (string) $value);
+                    list($multiplier, $code) = explode(" ", (string)$value);
 
                     $header[$i] = [
                         "column" => $i,
-                        "multiplier" => (int) $multiplier,
-                        "code" => $code
+                        "multiplier" => (int)$multiplier,
+                        "code" => $code,
                     ];
                 }
             }
 
-            while ($row = ($source->fgetcsv(separator: "|") ?? [])) {
+            // Process each data row
+            while (($row = $source->fgetcsv("|")) !== false) {
+                if (!is_array($row)) {
+                    continue;
+                }
 
-                $dateLine = DateTime::createFromFormat(format: "j.n.Y", datetime: ($row["0"] ?? ""));
+                $inputDate = $row[0] ?? '1970-01-01';
+                $dateLine = DateTime::createFromFormat(self::DATA_LINE_FORMAT, $inputDate);
 
                 if ($dateLine === false) {
-
                     break;
-
-                } else {
-
-                    $item = [];
-
-                    foreach ($row as $key => $value) {
-
-                        if ($key === 0) {
-                            continue;
-                        }
-
-                        $ivalue = (float)str_replace(search: ",", replace: ".", subject: (string) $value);
-
-                        $item[$header[$key]["code"]] = $ivalue / $header[$key]["multiplier"];
-                    }
-
-                    $data[$dateLine->format(format: "Y-m-d")] = $item;
                 }
+
+                $item = [];
+                foreach ($row as $key => $value) {
+                    if ($key === 0) continue;
+
+                    $ivalue = (float)str_replace(",", ".", (string)$value);
+                    $item[$header[$key]["code"]] = $ivalue / $header[$key]["multiplier"];
+                }
+
+                $data[$dateLine->format(self::DATA_SAVE_FORMAT)] = $item;
             }
         }
 
@@ -124,82 +156,61 @@ final class CurrencyStorage
     }
 
     /**
+     * Downloads and stores the currency exchange data from the CNB.
+     *
      * @return void
+     * @throws RuntimeException If the data could not be stored.
      */
     protected function _storeSource(): void
     {
-
         if ($this->_canCreate()) {
-
             $dir = $this->getFile();
 
-            if (!is_dir(filename: $this->directory)) {
-
-                mkdir(directory: $this->directory, permissions: 0775, recursive: true);
+            if (!is_dir($this->directory)) {
+                mkdir($this->directory, 0775, true);
             }
 
-            $success = file_put_contents(filename: $dir, data: file_get_contents(filename: $this->getUrl()));
+            $success = file_put_contents($dir, file_get_contents($this->getUrl()));
 
-            if ($success === FALSE) {
-
-                throw new RuntimeException("Lemonade\\Currency\\Storage " . "url: `{$this->getUrl()}` , soubor: `{$this->getFile()}`");
+            if ($success === false) {
+                throw new RuntimeException("Failed to store currency data from URL: `{$this->getUrl()}` to file: `{$this->getFile()}`");
             }
-
         }
     }
 
     /**
-     * @return bool
+     * Determines if a new data file should be created.
+     *
+     * @return bool True if the file can be created, false otherwise.
      */
     protected function _canCreate(): bool
     {
-
-        if (!$this->_validFile()) {
-
-            return true;
-
-        } else {
-
-            return $this->_validCache();
-        }
-
+        return !$this->_validFile() || $this->_validCache();
     }
 
     /**
-     * @return bool
+     * Checks if the storage file exists and is valid.
+     *
+     * @return bool True if the file exists and is valid, false otherwise.
      */
     protected function _validFile(): bool
     {
-
-        return is_file(filename: $this->getFile()) && file_exists(filename: $this->getFile());
+        return is_file($this->getFile()) && file_exists($this->getFile());
     }
 
     /**
-     * @return bool
+     * Checks if the cached data is still valid.
+     *
+     * @return bool True if the cache is valid, false otherwise.
      */
     protected function _validCache(): bool
     {
-
-        $valid = false;
-
         try {
+            $filemtime = filemtime($this->getFile());
 
-            $filemtime = filemtime(filename: $this->getFile());
-
-            if ($filemtime !== false) {
-
-                $valid = $filemtime < (time() - 86400);
-            }
-
+            return $filemtime !== false && $filemtime < (time() - 86400); // Cached for less than a day
         } catch (Exception) {
-
+            return false;
         }
-
-        return $valid;
-
     }
-
-
 }
-/* End of file CurrencyStorage.php */
-/* /lemonade/component_currency/src/CurrencyStorage.php */

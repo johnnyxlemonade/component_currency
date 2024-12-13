@@ -1,20 +1,29 @@
 {
- "name": "lemonade/component_currency",
- "license": "MIT",
- "authors": [
-   {
-    "name": "Honza Mudrak",
-    "email": "honza@core1.agency",
-    "homepage": "https://core1.agency"
-   }
- ],        
- "autoload": { 
-   "psr-4": {
-     "Lemonade\\Currency\\": "src/"
-   }
- }, 
- "require": {
-   "php": ">=8.1"
- }
+  "name": "lemonade/component_currency",
+  "type": "library",
+  "license": "MIT",
+  "description": "Lemonade Currency Conversion Library provides a reliable PHP solution for converting currencies using the Czech National Bank (CNB) as a primary source. Fully compatible with PHP 8.1 and optimized for static analysis with PHPStan.",
+  "authors": [
+    {
+      "name": "Honza Mudrak",
+      "email": "honzamudrak@gmail.com",
+      "homepage": "https://github.com/johnnyxlemonade",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Lemonade\\Currency\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=8.1 <8.5"
+  },
+  "config": {
+    "sort-packages": true,
+    "preferred-install": "dist",
+    "optimize-autoloader": true
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
 }
-

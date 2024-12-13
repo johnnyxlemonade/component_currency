@@ -12,23 +12,23 @@ final class CurrencyList
     public const CURRENCY_USD = "USD";
 
     /**
-     * Podrobnosti o měnách, obsahuje symboly a názvy jazyků.
+     * Detailed information about currencies, including symbols and language names.
      *
      * @var array<string, array<string, string>>
      */
     private static array $currencies = [
-        self::CURRENCY_CZK => ['symbol' => 'Kč', 'languageName' => 'čeština'],
-        self::CURRENCY_EUR => ['symbol' => '€', 'languageName' => 'němčina'],
-        self::CURRENCY_HUF => ['symbol' => 'ft', 'languageName' => 'maďarština'],
-        self::CURRENCY_PLN => ['symbol' => 'zł', 'languageName' => 'polština'],
-        self::CURRENCY_GBP => ['symbol' => '£', 'languageName' => 'angličtina'],
-        self::CURRENCY_USD => ['symbol' => '$', 'languageName' => 'angličtina'],
+        self::CURRENCY_CZK => ['symbol' => 'Kč', 'languageName' => 'Czech'],
+        self::CURRENCY_EUR => ['symbol' => '€', 'languageName' => 'English'],
+        self::CURRENCY_HUF => ['symbol' => 'ft', 'languageName' => 'Hungarian'],
+        self::CURRENCY_PLN => ['symbol' => 'zł', 'languageName' => 'Polish'],
+        self::CURRENCY_GBP => ['symbol' => '£', 'languageName' => 'English'],
+        self::CURRENCY_USD => ['symbol' => '$', 'languageName' => 'English'],
     ];
 
     /**
-     * Definovane meny
-     * @todo meny do enum
-     * @return string[]
+     * Returns a list of defined currency codes.
+     * @todo Consider converting currencies into enums.
+     * @return string[] Array of currency codes.
      */
     public static function getCurrencies(): array
     {
@@ -38,14 +38,14 @@ final class CurrencyList
             self::CURRENCY_HUF,
             self::CURRENCY_PLN,
             self::CURRENCY_GBP,
-            self::CURRENCY_USD
+            self::CURRENCY_USD,
         ];
     }
 
     /**
-     * Vrací seznam symbolů všech podporovaných měn.
+     * Returns a list of symbols for all supported currencies.
      *
-     * @return array<string, string> Klíč představuje kód měny a hodnota symbol měny.
+     * @return array<string, string> The key represents the currency code, and the value is the currency symbol.
      */
     public static function getCurrencySymbolList(): array
     {
@@ -53,10 +53,10 @@ final class CurrencyList
     }
 
     /**
-     * Vrací symbol měny nebo výchozí symbol pro CZK.
+     * Returns the currency symbol or the default symbol for CZK.
      *
-     * @param string|null $currency Kód měny (např. "CZK", "EUR").
-     * @return string Symbol měny nebo výchozí symbol pro CZK.
+     * @param string|null $currency The currency code (e.g., "CZK", "EUR").
+     * @return string The currency symbol or the default symbol for CZK.
      */
     public static function getCurrencySymbol(?string $currency = null): string
     {
@@ -64,10 +64,10 @@ final class CurrencyList
     }
 
     /**
-     * Vrací název jazyka spojený s měnou nebo výchozí jazyk pro CZK.
+     * Returns the language name associated with the currency or the default for CZK.
      *
-     * @param string|null $currency Kód měny (např. "CZK", "EUR").
-     * @return string Název jazyka spojený s měnou nebo výchozí jazyk pro CZK.
+     * @param string|null $currency The currency code (e.g., "CZK", "EUR").
+     * @return string The language name associated with the currency or the default for CZK.
      */
     public static function getCurrencyLanguageName(?string $currency = null): string
     {
@@ -75,9 +75,9 @@ final class CurrencyList
     }
 
     /**
-     * Vrací seznam symbolů všech podporovaných měn.
+     * Returns a list of symbols for all supported currencies.
      *
-     * @deprecated Použijte metodu getCurrencySymbolList() místo getSymbolList().
+     * @deprecated Use getCurrencySymbolList() instead of getSymbolList().
      * @return array<string>
      */
     public static function getSymbolList(): array
@@ -86,10 +86,10 @@ final class CurrencyList
     }
 
     /**
-     * Vrací symbol měny nebo výchozí symbol pro CZK.
+     * Returns the currency symbol or the default symbol for CZK.
      *
-     * @deprecated Použijte metodu getCurrencySymbol() místo getSymbol().
-     * @param string|null $currency
+     * @deprecated Use getCurrencySymbol() instead of getSymbol().
+     * @param string|null $currency The currency code.
      * @return string
      */
     public static function getSymbol(?string $currency = null): string
@@ -98,11 +98,11 @@ final class CurrencyList
     }
 
     /**
-     * Vrací jméno jazyka spojeného s danou měnou.
+     * Returns the language name associated with the given currency.
      *
-     * @deprecated Použijte metodu getCurrencyLanguageName() místo getTranslator().
-     * @param string|null $currency Kód měny (např. "CZK", "EUR").
-     * @return string Název jazyka spojeného s měnou nebo výchozí jazyk pro CZK.
+     * @deprecated Use getCurrencyLanguageName() instead of getTranslator().
+     * @param string|null $currency The currency code (e.g., "CZK", "EUR").
+     * @return string The language name associated with the currency or the default for CZK.
      */
     public static function getTranslator(?string $currency = null): string
     {
