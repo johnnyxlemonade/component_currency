@@ -16,8 +16,19 @@
       "Lemonade\\Currency\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Lemonade\\Currency\\Tests\\": "tests/"
+    }
+  },
   "require": {
     "php": ">=8.1 <8.5"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^10.5"
+  },
+  "scripts": {
+    "test": "phpunit --configuration phpunit.xml"
   },
   "config": {
     "sort-packages": true,
