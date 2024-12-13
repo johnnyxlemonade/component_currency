@@ -3,6 +3,7 @@
 namespace Lemonade\Currency;
 use DateInterval;
 use DateTime;
+use Throwable;
 
 /**
  * Class CurrencyRate
@@ -37,9 +38,14 @@ final class CurrencyRate
             $afternoon = new DateTime('14:30');
 
             // If the current time is earlier than 14:30, use the previous day.
-            if ($currentTime < $afternoon) {
-                $this->date->sub(new DateInterval('P1D'));
+            try {
+                if ($currentTime < $afternoon) {
+                    $this->date->sub(new DateInterval('P1D'));
+                }
+            } catch (\DateInvalidOperationException|Throwable) {
+                // Ignore the exception, as the fallback behavior is acceptable
             }
+
         }
 
         // Initialize CurrencyMarket with the adjusted date.
