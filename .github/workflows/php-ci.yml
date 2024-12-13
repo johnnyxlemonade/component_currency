@@ -1,0 +1,70 @@
+name: PHP CI
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths-ignore:
+      - 'demo/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - 'demo/**'
+      - '*.md'
+
+jobs:
+  phpunit:
+    name: PHPUnit Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version:
+          - "8.1"
+          - "8.2"
+          - "8.3"
+          - "8.4"
+        deps:
+          - "highest"
+          - "lowest"
+        include:
+          - php-version: "8.1"
+            deps: "lowest"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP environment
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
+          extensions: mbstring, intl, curl
+          ini-values: |
+            memory_limit=-1
+          tools: composer
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v3
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      - name: Install composer dependencies
+        run: |
+          if [ "${{ matrix.deps }}" == "lowest" ]; then
+            composer update --prefer-lowest --prefer-dist --no-progress --no-suggest --no-interaction;
+          else
+            composer install --prefer-dist --no-progress --no-suggest --no-interaction;
+          fi
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit --configuration phpunit.xml
